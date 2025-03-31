@@ -1,5 +1,5 @@
 {
-  description = "The command line interface for Nilla.";
+  description = "Nixos support for Nilla.";
 
   outputs = inputs:
     let
@@ -8,7 +8,7 @@
     {
       packages = {
         x86_64-linux = rec {
-          nilla = project.packages.nilla-cli.result.x86_64-linux;
+          nilla = project.packages.nilla-nixos.result.x86_64-linux;
           default = nilla;
         };
       };
