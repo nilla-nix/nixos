@@ -37,7 +37,13 @@ pub async fn build_cmd(cli: &nixos_cli_def::Cli, args: &nixos_cli_def::commands:
 
     let attribute = &format!("systems.nixos.\"{hostname}\".result.config.system.build.toplevel");
 
-    match nix::exists_in_project("nilla.nix", entry.clone(), &attribute).await {
+    match nix::exists_in_project(
+        "nilla.nix",
+        entry.clone(),
+        &format!("systems.nixos.\"{hostname}\""),
+    )
+    .await
+    {
         Ok(false) => {
             return error!("Attribute {attribute} does not exist in project {path:?}");
         }

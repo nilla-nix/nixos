@@ -41,7 +41,13 @@ pub async fn switch_cmd(
 
     let attribute = &format!("systems.nixos.\"{hostname}\".result.config.system.build.toplevel");
 
-    match nix::exists_in_project("nilla.nix", entry.clone(), &attribute).await {
+    match nix::exists_in_project(
+        "nilla.nix",
+        entry.clone(),
+        &format!("systems.nixos.\"{hostname}\""),
+    )
+    .await
+    {
         Ok(false) => {
             return error!("Attribute {attribute} does not exist in project {path:?}");
         }
@@ -63,12 +69,24 @@ pub async fn switch_cmd(
 
     match out {
         Ok(o) => {
+            info!("Switching to new configuration");
             let out_path = &o[0];
-            Command::new("sudo")
+
+            let sudo = match which::which("sudo") {
+                Ok(s) => s,
+                Err(_e) => match which::which("doas") {
+                    Ok(d) => d,
+                    Err(_e) => return error!("Could not find sudo or doas"),
+                },
+            };
+
+            Command::new(sudo)
                 .arg(format!("{out_path}/bin/switch-to-configuration"))
                 .arg("switch")
                 .spawn()
                 .unwrap();
+
+            info!("Done!");
         }
         Err(e) => return error!("{:?}", e),
     };
