@@ -21,6 +21,10 @@ nilla.create ({ config }: {
       };
     };
 
+    modules.nilla = {
+      nixos = ./modules/nixos.nix;
+    };
+
     packages.default = config.packages.nilla-nixos;
     packages.nilla-nixos = {
       systems = [ "x86_64-linux" "aarch64-linux" ];
