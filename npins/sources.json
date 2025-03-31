@@ -1,0 +1,44 @@
+{
+  "pins": {
+    "fenix": {
+      "type": "Git",
+      "repository": {
+        "type": "GitHub",
+        "owner": "nix-community",
+        "repo": "fenix"
+      },
+      "branch": "monthly",
+      "submodules": false,
+      "revision": "f44d7c3596ff028ad9f7fcc31d1941ed585f11b3",
+      "url": "https://github.com/nix-community/fenix/archive/f44d7c3596ff028ad9f7fcc31d1941ed585f11b3.tar.gz",
+      "hash": "1axv80c6g3qg4aggggkh85nyxsw01pjdw6rlvsxm66hd25zxc779"
+    },
+    "nilla": {
+      "type": "Git",
+      "repository": {
+        "type": "GitHub",
+        "owner": "nilla-nix",
+        "repo": "nilla"
+      },
+      "branch": "main",
+      "submodules": false,
+      "revision": "ebdaf737ab4f4168dcb208caa88a18dfc4a62fbc",
+      "url": "https://github.com/nilla-nix/nilla/archive/ebdaf737ab4f4168dcb208caa88a18dfc4a62fbc.tar.gz",
+      "hash": "1ph1pqlgsv8417hc4kl51sglag9299j2qc75i1bxqa23hr2gcymr"
+    },
+    "nixpkgs": {
+      "type": "Git",
+      "repository": {
+        "type": "GitHub",
+        "owner": "nixos",
+        "repo": "nixpkgs"
+      },
+      "branch": "nixos-unstable",
+      "submodules": false,
+      "revision": "a84ebe20c6bc2ecbcfb000a50776219f48d134cc",
+      "url": "https://github.com/nixos/nixpkgs/archive/a84ebe20c6bc2ecbcfb000a50776219f48d134cc.tar.gz",
+      "hash": "053xxy1bn35d9088h3rznhqkqq7lnnhn4ahrilwik8l4b6k8inlq"
+    }
+  },
+  "version": 5
+}
