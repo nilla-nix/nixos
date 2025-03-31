@@ -83,8 +83,6 @@ pub async fn test_cmd(cli: &nixos_cli_def::Cli, args: &nixos_cli_def::commands::
                 .output()
                 .await
                 .unwrap();
-
-            info!("Done!");
         }
         Err(e) => return error!("{:?}", e),
     };

@@ -86,8 +86,6 @@ pub async fn switch_cmd(
                 .output()
                 .await
                 .unwrap();
-
-            info!("Done!");
         }
         Err(e) => return error!("{:?}", e),
     };
