@@ -83,7 +83,8 @@ pub async fn switch_cmd(
             Command::new(sudo)
                 .arg(format!("{out_path}/bin/switch-to-configuration"))
                 .arg("switch")
-                .spawn()
+                .output()
+                .await
                 .unwrap();
 
             info!("Done!");

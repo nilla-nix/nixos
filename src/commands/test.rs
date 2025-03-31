@@ -80,7 +80,8 @@ pub async fn test_cmd(cli: &nixos_cli_def::Cli, args: &nixos_cli_def::commands::
             Command::new(sudo)
                 .arg(format!("{out_path}/bin/switch-to-configuration"))
                 .arg("test")
-                .spawn()
+                .output()
+                .await
                 .unwrap();
 
             info!("Done!");
