@@ -1,7 +1,7 @@
 use clap::Args;
 
 #[derive(Debug, Args)]
-#[command(about = "Run a package's main program")]
+#[command(about = "Build, install, and switch into a system")]
 pub struct SwitchArgs {
     #[arg(help = "System name")]
     pub name: Option<String>,

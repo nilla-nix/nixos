@@ -1,6 +1,6 @@
 use clap::Args;
 #[derive(Debug, Args)]
-#[command(about = "Start a development shell from a Nilla project")]
+#[command(about = "Build a NixOS system")]
 pub struct BuildArgs {
     #[arg(help = "System name")]
     pub name: Option<String>,

@@ -1,7 +1,7 @@
 use clap::Args;
 
 #[derive(Debug, Args)]
-#[command(about = "Start a development shell from a Nilla project")]
+#[command(about = "Test a system")]
 pub struct TestArgs {
     #[arg(help = "System name")]
     pub name: Option<String>,
