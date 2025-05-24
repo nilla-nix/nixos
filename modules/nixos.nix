@@ -63,52 +63,42 @@ in
           };
         };
 
-        config = let
-          homeModules = map (homeName: let
-            system = submodule.config.pkgs.system;
+        config.modules = let
+          system = submodule.config.pkgs.system;
+          warn = builtins.warn or builtins.trace; # builtins.warn doesn't exist on some versions of nix/lix
+          warnIf = condition: message: value: if condition then warn message value else value;
+          homeManager = submodule.config.home-manager;
+        in (lib.fp.pipe [
+          (map (homeName: let
             home = global.config.homes.${homeName};
             homeNameParts = builtins.match "([a-z][-a-z0-9]*)(@([-A-Za-z0-9]+))?(:([-_A-Za-z0-9]+))?" homeName;
             username = builtins.elemAt homeNameParts 0;
-            warn = builtins.warn or builtins.trace; # builtins.warn doesn't exist on some versions of nix/lix
-            warnIf = condition: message: value: if condition then warn message value else value;
-            homeManager = submodule.config.home-manager;
-          in (
-            ({ config, lib, ... }@system:
-              warnIf (home.home-manager != homeManager) "The home \"${homeName}\" isn't using the same home-manager input as the NixOS system \"${name}\". This may work, but is not officially supported by the Nilla Home or Nilla NixOS maintainers. Please fix this before reporting any bugs you may find."
-            {
-              config = {
-                home-manager.users.${username} = {};
-                home-manager.sharedModules = (map
-                  (innerModule: let
-                    applyModuleArgs = { moduleConfig, extraArgs }: module: module
-                      (builtins.intersectAttrs
-                        (builtins.functionArgs module)
-                        (
-                          { system = config.system; }
-                          // moduleConfig._module.args
-                          // extraArgs)
-                        ); 
-                    callModule = module: moduleConfig: extraArgs:
-                      if (builtins.typeOf module) == "path"
-                        then builtins.addErrorContext "in a nilla home module imported from ${module}" (callModule (import module) moduleConfig extraArgs)
-                      else if (builtins.typeOf module) == "set"
-                        then module
-                      else
-                        builtins.addErrorContext "in a user-provided home module" (applyModuleArgs { inherit moduleConfig extraArgs; } module);
-                  in
-                    builtins.addErrorContext "in a nilla home module for home-manager.users.\"${username}\""
-                    ({ config, name, ... }@wrapper: lib.mkIf (name == username) (callModule innerModule wrapper.config (system.config.home-manager.extraSpecialArgs // home.args))))
-                  home.modules);
-              
-                users.users.${username} = {
-                  isNormalUser = lib.modules.mkDefault true;
-                };
-              };
-            })
-          )) submodule.config.homes;
-        in {
-          modules = (if submodule.config.homes != [] then [ submodule.config.home-manager.nixosModules.default ] else []) ++ homeModules;
-        };
+          in {
+            inherit home homeName username;
+          }))
+          (map ({home, homeName, username}@identity:
+            warnIf (home.home-manager != homeManager)
+              "The home \"${homeName}\" isn't using the same home-manager input as the NixOS system \"${name}\". This may work, but is not officially supported by the Nilla Home or Nilla NixOS maintainers. Please fix this before reporting any bugs you may find."
+            identity))
+          (map ({home, homeName, username}: {
+            homeModules = map (module: {
+              home-manager.users.${username} = module;
+            }) home.modules;
+            userModule = { lib, ... }: {
+              users.users.${username}.isNormalUser = lib.modules.mkDefault true;
+            };
+            argsModule = {
+              home-manager.users.${username} = { ... }: { _module.args = home.args; };
+            };
+          }))
+          lib.lists.flatten
+          (map ({homeModules, userModule, argsModule}: [ userModule argsModule ] ++ homeModules))
+          lib.lists.flatten
+        ] submodule.config.homes) ++ (
+          if submodule.config.homes != []
+          then [ submodule.config.home-manager.nixosModules.default ]
+          else []
+        );
       }));
     };
   };
