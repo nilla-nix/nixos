@@ -20,11 +20,11 @@
         "owner": "nilla-nix",
         "repo": "nilla"
       },
-      "branch": "main",
+      "branch": "private/minion/push-swlstmwvzvkr",
       "submodules": false,
-      "revision": "4e6038f4ebc89487194013af6a1e077dfeb00359",
-      "url": "https://github.com/nilla-nix/nilla/archive/4e6038f4ebc89487194013af6a1e077dfeb00359.tar.gz",
-      "hash": "sha256-7iLzbTLtgdFtm9em3xxHO9BunN2YpgYquMLKXh5hEpQ="
+      "revision": "1a45420c0b579aea97d834d04e6eec773a8391b1",
+      "url": "https://github.com/nilla-nix/nilla/archive/1a45420c0b579aea97d834d04e6eec773a8391b1.tar.gz",
+      "hash": "sha256-4jqikEAkh5GUKGDkGAtWRWZexN25Rzt0yIsnilhA77U="
     },
     "nixpkgs": {
       "type": "Git",
@@ -40,5 +40,5 @@
       "hash": "sha256-mNqIplmEohk5jRkqYqG19GA8MbQ/D4gQSK0Mu4LvfRQ="
     }
   },
-  "version": 6
+  "version": 7
 }
