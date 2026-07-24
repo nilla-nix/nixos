@@ -1,5 +1,6 @@
 use clap::builder::styling::Style;
 
+pub mod boot;
 pub mod build;
 pub mod completions;
 pub mod switch;

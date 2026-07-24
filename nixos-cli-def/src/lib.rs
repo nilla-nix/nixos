@@ -2,7 +2,7 @@ pub mod commands;
 
 use clap::{ArgAction, Parser, Subcommand};
 use commands::{
-    build::BuildArgs, completions::CompletionsArgs, switch::SwitchArgs, test::TestArgs,
+    boot::BootArgs, build::BuildArgs, completions::CompletionsArgs, switch::SwitchArgs, test::TestArgs,
 };
 
 #[derive(Parser, Debug)]
@@ -55,6 +55,7 @@ pub enum Commands {
     Switch(SwitchArgs),
     Test(TestArgs),
     Build(BuildArgs),
+    Boot(BootArgs),
     #[command(alias = "completion")]
     Completions(CompletionsArgs),
     #[command(external_subcommand)]
