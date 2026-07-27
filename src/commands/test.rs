@@ -1,52 +1,37 @@
-use log::{debug, error, info};
-use tokio::process::Command;
+use log::error;
+
+use crate::commands::common;
 
 pub async fn test_cmd(cli: &nixos_cli_def::Cli, args: &nixos_cli_def::commands::test::TestArgs) {
-    debug!("Resolving project {}", cli.project);
-    let Ok(project) = crate::util::project::resolve(&cli.project).await else {
-        return error!("Could not find project {}", cli.project);
+    let path = match common::get_nilla_nix_path(&cli.project).await {
+        Ok(p) => p,
+        Err(e) => return error!("{}", e),
     };
 
-    let mut path = project.get_path();
-
-    debug!("Resolved project {path:?}");
-
-    path.push("nilla.nix");
-
-    match path.try_exists() {
-        Ok(false) | Err(_) => return error!("File not found"),
-        _ => {}
-    }
-
-    let hostname = if let Some(name) = args.name.clone() {
-        if name.contains('.') {
-            return error!("Invalid hostname {}", name);
-        } else {
-            name
-        }
-    } else {
-        gethostname::gethostname().into_string().unwrap()
+    let hostname = match common::get_hostname(args.name.clone()) {
+        Ok(h) => h,
+        Err(e) => return error!("{}", e),
     };
 
-    let attribute = &format!("systems.nixos.\"{hostname}\".result");
+    let attribute = common::format_attribute(&hostname);
+    let (build_host, target_host) =
+        crate::util::args::extract_hosts_from_args(&args.extra_nixos_rebuild_args);
 
-    let sudo = match which::which("sudo") {
-        Ok(s) => s,
-        Err(_e) => match which::which("doas") {
-            Ok(d) => d,
-            Err(_e) => return error!("Could not find sudo or doas"),
-        },
+    // Don't use sudo locally if --target-host is specified (activation happens remotely)
+    let needs_sudo = target_host.is_none();
+
+    common::log_operation("Testing", &hostname, build_host.as_ref(), target_host.as_ref());
+
+    let mut cmd = match common::build_nixos_rebuild_command(
+        "test",
+        &path,
+        &attribute,
+        &args.extra_nixos_rebuild_args,
+        needs_sudo,
+    ) {
+        Ok(c) => c,
+        Err(e) => return error!("{}", e),
     };
 
-    info!("Testing system {hostname}");
-    Command::new(sudo)
-        .arg("nixos-rebuild")
-        .arg("test")
-        .arg("--file")
-        .arg(path.display().to_string())
-        .arg("--attr")
-        .arg(attribute)
-        .status()
-        .await
-        .unwrap();
+    cmd.status().await.unwrap();
 }
