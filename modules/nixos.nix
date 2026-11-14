@@ -1,10 +1,28 @@
 { lib, config }:
 let
   inherit (config) inputs;
+
+  nixpkgsDeferred = lib.types.create {
+    name = "NixpkgsDeferred";
+    description = "Nixpkgs deferred module";
+    check = with builtins; v: isAttrs v || isFunction v || isPath v;
+    merge = loc: defs: {
+      imports = map (def: {
+        _file = "${def.__file__}; via ${lib.options.getIdentifier loc}";
+        imports = [ def.value ];
+      }) defs;
+    };
+  };
 in
 {
-  options.systems = {
-    nixos = lib.options.create {
+  options = {
+    modules.nixos = lib.options.create {
+      description = "NixOS modules which are available from this Nilla project.";
+      type = lib.types.attrs.of nixpkgsDeferred;
+      default.value = { };
+    };
+
+    systems.nixos = lib.options.create {
       description = "NixOS systems to create.";
       default.value = { };
       type = lib.types.attrs.of (lib.types.submodule ({ config }: {
@@ -59,5 +77,15 @@ in
         message = "A Nixpkgs instance is required for the NixOS system \"${name}\", but none was provided and \"inputs.nixpkgs\" does not exist.";
       })
       config.systems.nixos;
+
+    explain.modules.nixos = {
+      name = "NixOS Modules";
+      description = "NixOS modules which are available from this Nilla project.";
+
+      data = {
+        columns = [ "Name" ];
+        rows = lib.attrs.mapToList (name: _: [ name ]) config.modules.nixos;
+      };
+    };
   };
 }
