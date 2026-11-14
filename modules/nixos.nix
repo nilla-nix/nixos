@@ -38,7 +38,7 @@ in
             description = "The created NixOS system.";
             type = lib.types.raw;
             writable = false;
-            default.value = import "${config.pkgs.path}/nixos/lib/eval-config.nix" {
+            default.value = import (config.pkgs.path + "/nixos/lib/eval-config.nix") {
               system = null;
               pkgs = config.pkgs;
               lib = config.pkgs.lib;
